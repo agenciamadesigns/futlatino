@@ -3832,3 +3832,323 @@ html {
     max-height: 48px;
   }
 }
+
+/* ==========================================================
+   FUTLATINO — NUESTROS PILARES (nuevo diseño)
+   Pegar AL FINAL de styles.css.
+   Usa clases nuevas con prefijo .pl- para no chocar con el CSS anterior
+   (puedes borrar los bloques viejos de .pillars / .pillar-card si quieres).
+
+   IMÁGENES: guarda tus fotos en la carpeta /contenido con estos nombres.
+   Mientras no existan, se muestran fotos de respaldo de Unsplash.
+     pilares-fondo.jpg   → foto grande del encabezado (jugadores con playera negra)
+     pilar-1.jpg  … pilar-4.jpg  → fotos de las 4 tarjetas
+     red-1.jpg    … red-4.jpg    → 4 fotos pequeñas de "Una red global"
+========================================================== */
+
+.pl {
+  --pl-card: #0b0c0d;
+  --pl-line: rgba(255, 255, 255, .12);
+  position: relative;
+  overflow: hidden;
+  padding: 150px 0 60px;
+  background: #0a0b0c;
+  color: var(--white);
+}
+
+/* Foto de fondo del encabezado, con degradado hacia negro */
+.pl-bg {
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 620px;
+  background:
+    linear-gradient(90deg, rgba(8,9,10,.92) 0%, rgba(8,9,10,.55) 45%, rgba(8,9,10,.2) 100%),
+    linear-gradient(180deg, rgba(8,9,10,.35) 0%, #0a0b0c 98%),
+    url("contenido/pilares-fondo.jpg") center 22% / cover no-repeat,
+    url("https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&w=1900&q=70") center 22% / cover no-repeat;
+}
+
+.pl-wrap {
+  position: relative;
+  width: min(1400px, calc(100% - 48px));
+  margin-inline: auto;
+}
+
+/* ---------- Encabezado ---------- */
+.pl-head { max-width: 820px; margin-bottom: 38px; }
+
+.pl-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 0 0 14px;
+  color: var(--gold);
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: .08em;
+}
+.pl-eyebrow i { display: block; width: 54px; height: 1px; background: var(--gold); }
+.pl-eyebrow-left i { width: 32px; }
+
+.pl-head h2 {
+  margin: 0;
+  font-family: var(--heading);
+  font-size: clamp(40px, 5vw, 66px);
+  font-weight: 800;
+  line-height: .98;
+  letter-spacing: .005em;
+  text-transform: uppercase;
+}
+
+.pl-lead {
+  max-width: 600px;
+  margin: 16px 0 0;
+  color: #e8e7e2;
+  font-size: clamp(16px, 1.5vw, 20px);
+  line-height: 1.5;
+}
+
+/* ---------- Tarjetas ---------- */
+.pl-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  align-items: stretch;
+}
+
+.pl-card {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+  background: var(--pl-card);
+  border: 1px solid var(--pl-line);
+  border-radius: 6px;
+  transition: border-color .3s ease, transform .3s ease;
+}
+.pl-card:hover { border-color: rgba(215, 183, 110, .6); transform: translateY(-5px); }
+
+.pl-photo {
+  height: 200px;
+  background-color: #1b1d1e;
+  background-size: cover;
+  background-position: center;
+}
+.pl-photo-1 {
+  background-image:
+    url("contenido/pilar-1.jpg"),
+    url("https://images.unsplash.com/photo-1521412644187-c49fa049e84d?auto=format&fit=crop&w=800&q=80");
+}
+.pl-photo-2 {
+  background-image:
+    url("contenido/pilar-2.jpg"),
+    url("https://images.unsplash.com/photo-1517466787929-bc90951d0974?auto=format&fit=crop&w=800&q=80");
+}
+.pl-photo-3 {
+  background-image:
+    url("contenido/pilar-3.jpg"),
+    url("https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=800&q=80");
+}
+.pl-photo-4 {
+  background-image:
+    url("contenido/pilar-4.jpg"),
+    url("https://images.unsplash.com/photo-1522778119026-d647f0596c20?auto=format&fit=crop&w=800&q=80");
+}
+
+.pl-body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  padding: 22px 26px 28px;
+}
+
+/* Icono + número + línea dorada */
+.pl-top { display: flex; align-items: center; gap: 14px; margin-bottom: 18px; }
+
+.pl-icon {
+  display: inline-grid;
+  place-items: center;
+  flex: 0 0 46px;
+  width: 46px;
+  height: 46px;
+  border: 1px solid var(--gold);
+  border-radius: 50%;
+  color: var(--gold);
+  font-size: 18px;
+}
+
+.pl-num {
+  color: var(--gold);
+  font-family: var(--heading);
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.pl-line { display: block; width: 56px; height: 2px; background: var(--gold); }
+
+.pl-body h3 {
+  margin: 0 0 14px;
+  font-family: var(--heading);
+  font-size: clamp(22px, 1.9vw, 27px);
+  font-weight: 800;
+  line-height: 1.05;
+  text-transform: uppercase;
+}
+
+.pl-body p {
+  margin: 0 0 26px;
+  color: #c8c8c3;
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+/* Botón circular con flecha */
+.pl-arrow {
+  display: inline-grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  margin-top: auto;
+  border: 1.5px solid rgba(255, 255, 255, .85);
+  border-radius: 50%;
+  color: #fff;
+  font-size: 15px;
+  transition: background .25s, color .25s, border-color .25s, transform .25s;
+}
+.pl-card:hover .pl-arrow,
+.pl-arrow:hover {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: #101112;
+  transform: translateX(4px);
+}
+
+/* ---------- Red global ---------- */
+.pl-network {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+  align-items: center;
+  gap: 30px;
+  margin-top: 14px;
+  padding: 16px 0 16px 28px;
+  overflow: hidden;
+  border-top: 1px solid var(--pl-line);
+}
+
+/* Mapa de puntos decorativo */
+.pl-network::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  opacity: .5;
+  background:
+    radial-gradient(circle, rgba(215,183,110,.5) 1.2px, transparent 1.6px) 0 0 / 10px 10px;
+  -webkit-mask-image: radial-gradient(ellipse 60% 120% at 28% 40%, #000 0%, transparent 75%);
+          mask-image: radial-gradient(ellipse 60% 120% at 28% 40%, #000 0%, transparent 75%);
+  pointer-events: none;
+}
+/* Puntos dorados brillantes */
+.pl-network::after {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  left: 0; top: 0; width: 100%; height: 100%;
+  pointer-events: none;
+  background:
+    radial-gradient(circle, var(--gold) 0 3px, transparent 4px) 38% 42% / 14px 14px no-repeat,
+    radial-gradient(circle, var(--gold) 0 3px, transparent 4px) 8% 68% / 14px 14px no-repeat,
+    radial-gradient(circle, var(--gold) 0 3px, transparent 4px) 48% 76% / 14px 14px no-repeat;
+}
+
+.pl-network-copy { position: relative; z-index: 1; max-width: 620px; }
+
+.pl-network-copy h3 {
+  margin: 0 0 12px;
+  font-family: var(--heading);
+  font-size: clamp(30px, 3vw, 40px);
+  font-weight: 800;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.pl-network-copy p:not(.pl-eyebrow) {
+  margin: 0;
+  color: #d4d3ce;
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+.pl-network-photos {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.pl-mini {
+  height: 185px;
+  border-radius: 3px;
+  background-color: #1b1d1e;
+  background-size: cover;
+  background-position: center;
+}
+.pl-mini-1 {
+  background-image:
+    url("contenido/red-1.jpg"),
+    url("https://images.unsplash.com/photo-1521791136064-7986c2920216?auto=format&fit=crop&w=500&q=80");
+}
+.pl-mini-2 {
+  background-image:
+    url("contenido/red-2.jpg"),
+    url("https://images.unsplash.com/photo-1508098682722-e99c643e7f0b?auto=format&fit=crop&w=500&q=80");
+}
+.pl-mini-3 {
+  background-image:
+    url("contenido/red-3.jpg"),
+    url("https://images.unsplash.com/photo-1431324155629-1a6deb1dec8d?auto=format&fit=crop&w=500&q=80");
+}
+.pl-mini-4 {
+  background-image:
+    url("contenido/red-4.jpg"),
+    url("https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=500&q=80");
+}
+
+/* ---------- Laptop / tablet ---------- */
+@media (max-width: 1100px) {
+  .pl { padding-top: 130px; }
+  .pl-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+  .pl-photo { height: 240px; }
+  .pl-network { grid-template-columns: 1fr; padding: 28px 0 0; }
+  .pl-network-photos { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+
+/* ---------- Móvil ---------- */
+@media (max-width: 600px) {
+  .pl { padding: 105px 0 40px; }
+  .pl-bg { height: 520px; background-position: 62% 18%, center, 62% 22%, 62% 22%; }
+  .pl-wrap { width: calc(100% - 32px); }
+  .pl-head { margin-bottom: 28px; }
+  .pl-eyebrow { font-size: 12px; }
+  .pl-eyebrow i { width: 36px; }
+  .pl-head h2 { font-size: clamp(36px, 10.5vw, 46px); }
+  .pl-lead { font-size: 15px; }
+
+  .pl-grid { grid-template-columns: 1fr; gap: 14px; }
+  .pl-photo { height: 210px; }
+  .pl-body { padding: 20px 20px 24px; }
+  .pl-body p { font-size: 14px; }
+
+  .pl-network-photos { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .pl-mini { height: 150px; }
+  .pl-network-copy h3 { font-size: 32px; }
+}
+
+/* ---------- Accesibilidad ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .pl-card, .pl-arrow { transition: none; }
+  .pl-card:hover, .pl-card:hover .pl-arrow, .pl-arrow:hover { transform: none; }
+}

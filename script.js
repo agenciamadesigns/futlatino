@@ -3,10 +3,21 @@
   const menuToggle = document.querySelector(".menu-toggle");
   const nav = document.querySelector(".main-nav");
 
+  // Texto accesible del botón de menú según el idioma activo
+  function updateMenuLabel() {
+    if (!menuToggle) return;
+    const lang = window.FUTLATINO_LANG || "es";
+    const t = window.FUTLATINO_TRANSLATIONS?.[lang];
+    if (!t) return;
+    const open = menuToggle.getAttribute("aria-expanded") === "true";
+    menuToggle.setAttribute("aria-label", open ? t.menuClose : t.menuOpen);
+  }
+
   function closeMenu() {
     menuToggle?.setAttribute("aria-expanded", "false");
     nav?.classList.remove("open");
     document.body.classList.remove("menu-open");
+    updateMenuLabel();
   }
 
   menuToggle?.addEventListener("click", () => {
@@ -14,6 +25,7 @@
     menuToggle.setAttribute("aria-expanded", String(!isOpen));
     nav?.classList.toggle("open", !isOpen);
     document.body.classList.toggle("menu-open", !isOpen);
+    updateMenuLabel();
   });
 
   nav?.querySelectorAll("a").forEach(link => link.addEventListener("click", closeMenu));
@@ -21,7 +33,7 @@
     if (window.innerWidth > 850) closeMenu();
   });
 
-  // Carrusel de testimonios
+  // Carrusel de testimonios (si existe en la página)
   const slides = [...document.querySelectorAll(".quote-slide")];
   const count = document.querySelector(".quote-count");
   let currentSlide = 0;
@@ -44,12 +56,21 @@
   const year = document.getElementById("year");
   if (year) year.textContent = new Date().getFullYear();
 
-  // Formulario de demostración: valida los campos y prepara el mensaje para WhatsApp.
+  // Formulario: valida los campos y prepara el mensaje para WhatsApp.
   // Sustituye WHATSAPP_NUMBER por el número oficial en formato internacional, sin + ni espacios.
   const WHATSAPP_NUMBER = "";
   const form = document.getElementById("application-form");
   const feedback = document.getElementById("form-feedback");
   const toast = document.getElementById("toast");
+
+  // Mensajes traducibles (definidos en el sistema de idiomas más abajo)
+  const msg = key => window.FUTLATINO_I18N?.message(key) || "";
+
+  function setFeedback(key) {
+    if (!feedback) return;
+    feedback.dataset.feedbackKey = key;
+    feedback.textContent = msg(key);
+  }
 
   function showToast(message) {
     if (!toast) return;
@@ -75,56 +96,35 @@
 
     if (WHATSAPP_NUMBER) {
       window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`, "_blank", "noopener,noreferrer");
-      if (feedback) feedback.textContent = "Se abrió WhatsApp para que puedas enviar tu postulación.";
+      setFeedback("whatsappOpened");
     } else {
-      if (feedback) feedback.textContent = "El formulario está validado. Para recibir postulaciones, configura el número oficial de WhatsApp o conecta un servicio de formularios.";
-      showToast("Formulario de demostración: falta configurar el canal de recepción.");
+      setFeedback("demoReady");
+      showToast(msg("demoToast"));
       console.info("Postulación Futlatino (demo):\n" + message);
     }
   });
-
-  // Enlaces sociales de muestra: evita que el # lleve al principio sin una URL configurada.
-  document.querySelectorAll(".social-links a[href='#']").forEach(link => {
-    link.addEventListener("click", event => {
-      event.preventDefault();
-      showToast("Agrega aquí el enlace oficial de esta red social.");
-    });
-  });
-
 })();
-
-
-/* =====================================
-   FUTLATINO — CAMBIO DE IDIOMA ES / EN
-===================================== */
-
-const languageButton = document.querySelector(".language-switch");
 
 
 /* =====================================================
    FUTLATINO — SISTEMA DE IDIOMAS ES / EN
    Traduce el contenido de toda la página.
+   IMPORTANTE: los textos en "es" deben coincidir con los del HTML,
+   porque al cargar la página se aplica el idioma guardado.
 ===================================================== */
 
 (() => {
   "use strict";
 
   const switchButton = document.querySelector(".language-switch");
-
   if (!switchButton) return;
 
   const translations = {
     es: {
       announcement: "TALENTO LATINOAMERICANO. OPORTUNIDADES SIN FRONTERAS.",
-      menu: [
-        "Inicio",
-        "Sobre Futlatino",
-        "Programas",
-        "Experiencias",
-        "Historias",
-        "Contacto"
-      ],
+      menu: ["Inicio", "Sobre Futlatino", "Programas", "Experiencias", "Historias", "Contacto"],
       applyButton: "POSTÚLATE",
+
       heroEyebrow: "TU TALENTO, EL MUNDO",
       heroTitle: "EL TALENTO<br>LATINOAMERICANO,<br><em>SIN FRONTERAS.</em>",
       heroDescription: "Scouting, desarrollo y proyección internacional<br class=\"desktop-break\"> de jóvenes futbolistas latinoamericanos.",
@@ -132,36 +132,50 @@ const languageButton = document.querySelector(".language-switch");
       heroContact: "CONTÁCTANOS",
       scroll: "DESCUBRE FUTLATINO",
 
+      aboutImageLabel: "Jóvenes futbolistas entrenando en equipo",
       aboutEyebrow: "SOBRE FUTLATINO",
-      aboutTitle: "CONECTAMOS TALENTO<br>CON OPORTUNIDADES.",
-      aboutP1: "Futlatino es una plataforma que identifica, desarrolla y proyecta jóvenes futbolistas de América Latina, creando oportunidades reales en clubes, academias y torneos de Europa y Norteamérica.",
-      aboutP2: "Creemos en el talento latinoamericano y trabajamos para abrir caminos a través del fútbol, las experiencias y una red internacional de contactos.",
+      aboutTitle: "CREAMOS EXPERIENCIAS<br>Y OPORTUNIDADES.",
+      aboutText: "Impulsamos el talento latinoamericano a través del scouting, el desarrollo futbolístico y las experiencias internacionales, conectando jugadores con nuevas oportunidades en el fútbol global.",
       aboutLink: "CONOCE NUESTRO MÉTODO",
 
-      programsEyebrow: "NUESTROS PILARES",
-      programsTitle: "DEL TALENTO A LA OPORTUNIDAD.",
-      programsIntro: "Un camino integral para que cada jugador pueda dar el siguiente paso.",
-      cards: [
+      // Nuestros pilares (nuevo diseño)
+      pillarsEyebrow: "NUESTROS PILARES",
+      pillarsTitle: "IMPULSAMOS EL TALENTO LATINOAMERICANO",
+      pillarsLead: "A través de experiencias, oportunidades y una red internacional, conectamos a jóvenes futbolistas con su próximo nivel.",
+      pillars: [
         {
-          title: "SCOUTING<br>Y VISORÍAS",
-          description: "Identificamos talento en toda Latinoamérica y detectamos el potencial de cada jugador.",
-          aria: "Postularse a scouting"
+          title: "SCOUTING Y VISORÍAS",
+          description: "Mediante eventos de detección de talento en distintas ciudades de Latinoamérica y Estados Unidos, identificamos futbolistas con potencial para formar parte de nuestros distintos programas.",
+          aria: "Postularse a scouting y visorías",
+          image: "Scouting y visorías"
         },
         {
-          title: "FUTLATINO SELECT",
-          description: "Selección de jugadores y formación de equipos para competir en torneos y eventos internacionales.",
-          aria: "Conocer Futlatino Select"
+          title: "SELECTIVOS Y GIRAS INTERNACIONALES",
+          description: "Formamos selectivos de competición para participar en torneos y giras internacionales, ofreciendo experiencias de alto nivel que impulsan el desarrollo de nuestros jugadores.",
+          aria: "Conocer selectivos y giras",
+          image: "Selectivos y giras internacionales"
         },
         {
-          title: "DESARROLLO<br>DEL JUGADOR",
-          description: "Entrenamiento, formación y acompañamiento para crecer dentro y fuera de la cancha.",
-          aria: "Conocer desarrollo del jugador"
+          title: "TRYOUTS Y OPORTUNIDADES EN CLUBES",
+          description: "Facilitamos oportunidades de pruebas deportivas con clubes de Europa, conectando a jugadores con procesos de evaluación acordes con su perfil y potencial futbolístico.",
+          aria: "Conocer tryouts en clubes",
+          image: "Tryouts y oportunidades en clubes"
         },
         {
-          title: "EXPERIENCIAS<br>INTERNACIONALES",
-          description: "Viajes, entrenamientos, torneos y oportunidades de exposición en Europa y Norteamérica.",
-          aria: "Ver experiencias internacionales"
+          title: "PLANIFICACIÓN DE CARRERA Y REPRESENTACIÓN",
+          description: "Acompañamos a los futbolistas en la planificación de su trayectoria, identificando oportunidades y diseñando estrategias de desarrollo profesional. Cuando corresponde, también ofrecemos servicios de representación mediante profesionales habilitados.",
+          aria: "Conocer planificación de carrera",
+          image: "Planificación de carrera y representación"
         }
+      ],
+      networkEyebrow: "UNA RED GLOBAL",
+      networkTitle: "ALIANZAS QUE GENERAN OPORTUNIDADES",
+      networkText: "Contamos con una amplia red de clubes, academias, agentes FIFA y profesionales del fútbol en distintos mercados alrededor del mundo. Estas alianzas nos permiten crear rutas reales de desarrollo y proyección para nuestros jugadores.",
+      networkImages: [
+        "Acuerdo con clubes y agentes",
+        "Staff técnico en el campo",
+        "Balón en estadio",
+        "Jugadores viajando"
       ],
 
       experiencesEyebrow: "EXPERIENCIAS INTERNACIONALES",
@@ -170,34 +184,17 @@ const languageButton = document.querySelector(".language-switch");
       tiles: ["EUROPA", "ACADEMIAS", "NORTEAMÉRICA", "TORNEOS"],
 
       testimonials: [
-        {
-          quote: "Futlatino me dio la oportunidad de mostrar mi talento en Europa. Hoy estoy cumpliendo un sueño.",
-          role: "JUGADOR FUTLATINO",
-          program: "CLUB EN EUROPA"
-        },
-        {
-          quote: "Aprendí que el trabajo diario y la disciplina pueden llevarte mucho más lejos de lo que imaginas.",
-          role: "JUGADOR FUTLATINO",
-          program: "PROGRAMA INTERNACIONAL"
-        },
-        {
-          quote: "Fue una experiencia que cambió mi forma de ver el fútbol y mi futuro como jugador.",
-          role: "JUGADOR FUTLATINO",
-          program: "FUTLATINO SELECT"
-        }
+        { quote: "Futlatino me dio la oportunidad de mostrar mi talento en Europa. Hoy estoy cumpliendo un sueño.", role: "JUGADOR FUTLATINO", program: "CLUB EN EUROPA" },
+        { quote: "Aprendí que el trabajo diario y la disciplina pueden llevarte mucho más lejos de lo que imaginas.", role: "JUGADOR FUTLATINO", program: "PROGRAMA INTERNACIONAL" },
+        { quote: "Fue una experiencia que cambió mi forma de ver el fútbol y mi futuro como jugador.", role: "JUGADOR FUTLATINO", program: "FUTLATINO SELECT" }
       ],
-
       previousTestimonial: "Testimonio anterior",
       nextTestimonial: "Siguiente testimonio",
 
       applicationEyebrow: "SÉ PARTE",
       applicationTitle: "EL SIGUIENTE PASO<br><em>COMIENZA AQUÍ.</em>",
       applicationDescription: "Postúlate, colabora o conoce más sobre nuestro proyecto.",
-      steps: [
-        "Cuéntanos de ti",
-        "Conecta con el equipo",
-        "Da el siguiente paso"
-      ],
+      steps: ["Cuéntanos de ti", "Conecta con el equipo", "Da el siguiente paso"],
 
       formEyebrow: "01 — POSTULACIÓN",
       formTitle: "Hablemos de tu futuro.",
@@ -213,45 +210,39 @@ const languageButton = document.querySelector(".language-switch");
       countryPlaceholder: "Selecciona tu país",
       agePlaceholder: "Tu edad",
       positionPlaceholder: "Selecciona posición",
+      emailPlaceholder: "nombre@correo.com",
       messagePlaceholder: "Club actual, experiencia, objetivos...",
-      countries: [
-        "México", "Argentina", "Brasil", "Chile", "Colombia",
-        "Ecuador", "Perú", "Uruguay", "Estados Unidos", "Otro"
-      ],
-      positions: [
-        "Portero", "Defensa", "Mediocampista",
-        "Delantero", "Entrenador / Academia", "Otro"
-      ],
+      countries: ["México", "Argentina", "Brasil", "Chile", "Colombia", "Ecuador", "Perú", "Uruguay", "Estados Unidos", "Otro"],
+      positions: ["Portero", "Defensa", "Mediocampista", "Delantero", "Entrenador / Academia", "Otro"],
       consent: "Autorizo a Futlatino a contactarme sobre esta postulación.",
       submit: "ENVIAR POSTULACIÓN",
       formNote: "* Campos obligatorios. Tu información será tratada de forma confidencial.",
 
       footerCopyright: "Futlatino. Todos los derechos reservados.",
       footerSlogan: "Talento latinoamericano. Sin fronteras.",
+      poweredBy: "POWERED BY",
 
       menuOpen: "Abrir menú",
       menuClose: "Cerrar menú",
       changeLanguage: "Cambiar a inglés",
+      homeLabel: "Futlatino, inicio",
 
       feedback: {
         required: "Por favor, completa todos los campos obligatorios.",
         invalidEmail: "Introduce un correo electrónico válido.",
         success: "Tu postulación se ha enviado correctamente.",
-        error: "No se pudo enviar tu postulación. Inténtalo de nuevo."
+        error: "No se pudo enviar tu postulación. Inténtalo de nuevo.",
+        whatsappOpened: "Se abrió WhatsApp para que puedas enviar tu postulación.",
+        demoReady: "El formulario está validado. Para recibir postulaciones, configura el número oficial de WhatsApp o conecta un servicio de formularios.",
+        demoToast: "Formulario de demostración: falta configurar el canal de recepción."
       }
     },
 
     en: {
       announcement: "LATIN AMERICAN TALENT. OPPORTUNITIES WITHOUT BORDERS.",
-      menu: [
-        "Home",
-        "About Futlatino",
-        "Programs",
-        "Experiences",
-        "Stories",
-        "Contact"
-      ],
+      menu: ["Home", "About Futlatino", "Programs", "Experiences", "Stories", "Contact"],
       applyButton: "APPLY NOW",
+
       heroEyebrow: "YOUR TALENT, THE WORLD",
       heroTitle: "LATIN AMERICAN<br>TALENT,<br><em>WITHOUT BORDERS.</em>",
       heroDescription: "Scouting, development and international exposure<br class=\"desktop-break\"> for young Latin American footballers.",
@@ -259,72 +250,68 @@ const languageButton = document.querySelector(".language-switch");
       heroContact: "CONTACT US",
       scroll: "DISCOVER FUTLATINO",
 
+      aboutImageLabel: "Young footballers training as a team",
       aboutEyebrow: "ABOUT FUTLATINO",
-      aboutTitle: "CONNECTING TALENT<br>WITH OPPORTUNITY.",
-      aboutP1: "Futlatino is a platform that identifies, develops and promotes young footballers from Latin America, creating real opportunities with clubs, academies and tournaments across Europe and North America.",
-      aboutP2: "We believe in Latin American talent and work to open doors through football, unique experiences and an international network of contacts.",
+      aboutTitle: "WE CREATE EXPERIENCES<br>AND OPPORTUNITIES.",
+      aboutText: "We empower Latin American talent through scouting, football development and international experiences, connecting players with new opportunities in global football.",
       aboutLink: "DISCOVER OUR APPROACH",
 
-      programsEyebrow: "OUR PILLARS",
-      programsTitle: "FROM TALENT TO OPPORTUNITY.",
-      programsIntro: "A comprehensive pathway to help every player take the next step.",
-      cards: [
+      pillarsEyebrow: "OUR PILLARS",
+      pillarsTitle: "WE EMPOWER LATIN AMERICAN TALENT",
+      pillarsLead: "Through experiences, opportunities and an international network, we connect young footballers with their next level.",
+      pillars: [
         {
-          title: "SCOUTING<br>AND TRIALS",
-          description: "We identify talent throughout Latin America and recognize each player's potential.",
-          aria: "Apply for scouting"
+          title: "SCOUTING AND SHOWCASES",
+          description: "Through talent identification events in several cities across Latin America and the United States, we spot players with the potential to join our different programs.",
+          aria: "Apply to scouting and showcases",
+          image: "Scouting and showcases"
         },
         {
-          title: "FUTLATINO SELECT",
-          description: "Player selection and team development for international tournaments and events.",
-          aria: "Discover Futlatino Select"
+          title: "SELECT TEAMS AND INTERNATIONAL TOURS",
+          description: "We build competitive select teams to take part in international tournaments and tours, offering high-level experiences that drive our players' development.",
+          aria: "Learn about select teams and tours",
+          image: "Select teams and international tours"
         },
         {
-          title: "PLAYER<br>DEVELOPMENT",
-          description: "Training, education and guidance to grow on and off the pitch.",
-          aria: "Discover player development"
+          title: "TRYOUTS AND CLUB OPPORTUNITIES",
+          description: "We facilitate trial opportunities with European clubs, connecting players with evaluation processes that match their profile and football potential.",
+          aria: "Learn about club tryouts",
+          image: "Tryouts and club opportunities"
         },
         {
-          title: "INTERNATIONAL<br>EXPERIENCES",
-          description: "Travel, training, tournaments and exposure opportunities across Europe and North America.",
-          aria: "Explore international experiences"
+          title: "CAREER PLANNING AND REPRESENTATION",
+          description: "We support players in planning their career path, identifying opportunities and designing professional development strategies. When appropriate, we also offer representation services through licensed professionals.",
+          aria: "Learn about career planning",
+          image: "Career planning and representation"
         }
+      ],
+      networkEyebrow: "A GLOBAL NETWORK",
+      networkTitle: "PARTNERSHIPS THAT CREATE OPPORTUNITIES",
+      networkText: "We have a broad network of clubs, academies, FIFA agents and football professionals in different markets around the world. These partnerships allow us to create real pathways of development and exposure for our players.",
+      networkImages: [
+        "Agreement with clubs and agents",
+        "Coaching staff on the pitch",
+        "Ball in a stadium",
+        "Players traveling"
       ],
 
       experiencesEyebrow: "INTERNATIONAL EXPERIENCES",
       experiencesTitle: "MORE THAN TRIALS,<br>EXPERIENCES THAT TRANSFORM.",
-      experiencesDescription: "We give our players access to unique opportunities with clubs, academies and international tournaments, helping open doors to a future in professional football.",
+      experiencesDescription: "We take our players to unique opportunities with clubs, academies and international tournaments, aiming to open doors to a future in professional football.",
       tiles: ["EUROPE", "ACADEMIES", "NORTH AMERICA", "TOURNAMENTS"],
 
       testimonials: [
-        {
-          quote: "Futlatino gave me the opportunity to showcase my talent in Europe. Today, I'm living my dream.",
-          role: "FUTLATINO PLAYER",
-          program: "CLUB IN EUROPE"
-        },
-        {
-          quote: "I learned that daily hard work and discipline can take you much further than you ever imagined.",
-          role: "FUTLATINO PLAYER",
-          program: "INTERNATIONAL PROGRAM"
-        },
-        {
-          quote: "It was an experience that changed how I see football and my future as a player.",
-          role: "FUTLATINO PLAYER",
-          program: "FUTLATINO SELECT"
-        }
+        { quote: "Futlatino gave me the opportunity to showcase my talent in Europe. Today, I'm living my dream.", role: "FUTLATINO PLAYER", program: "CLUB IN EUROPE" },
+        { quote: "I learned that daily hard work and discipline can take you much further than you ever imagined.", role: "FUTLATINO PLAYER", program: "INTERNATIONAL PROGRAM" },
+        { quote: "It was an experience that changed how I see football and my future as a player.", role: "FUTLATINO PLAYER", program: "FUTLATINO SELECT" }
       ],
-
       previousTestimonial: "Previous testimonial",
       nextTestimonial: "Next testimonial",
 
       applicationEyebrow: "BE PART OF IT",
       applicationTitle: "YOUR NEXT STEP<br><em>STARTS HERE.</em>",
       applicationDescription: "Apply, collaborate or learn more about our project.",
-      steps: [
-        "Tell us about yourself",
-        "Connect with our team",
-        "Take the next step"
-      ],
+      steps: ["Tell us about yourself", "Connect with our team", "Take the next step"],
 
       formEyebrow: "01 — APPLICATION",
       formTitle: "Let's talk about your future.",
@@ -340,55 +327,56 @@ const languageButton = document.querySelector(".language-switch");
       countryPlaceholder: "Select your country",
       agePlaceholder: "Your age",
       positionPlaceholder: "Select a position",
+      emailPlaceholder: "name@email.com",
       messagePlaceholder: "Current club, experience, goals...",
-      countries: [
-        "Mexico", "Argentina", "Brazil", "Chile", "Colombia",
-        "Ecuador", "Peru", "Uruguay", "United States", "Other"
-      ],
-      positions: [
-        "Goalkeeper", "Defender", "Midfielder",
-        "Forward", "Coach / Academy", "Other"
-      ],
+      countries: ["Mexico", "Argentina", "Brazil", "Chile", "Colombia", "Ecuador", "Peru", "Uruguay", "United States", "Other"],
+      positions: ["Goalkeeper", "Defender", "Midfielder", "Forward", "Coach / Academy", "Other"],
       consent: "I authorize Futlatino to contact me regarding this application.",
       submit: "SUBMIT APPLICATION",
       formNote: "* Required fields. Your information will be treated confidentially.",
 
       footerCopyright: "Futlatino. All rights reserved.",
       footerSlogan: "Latin American talent. Without borders.",
+      poweredBy: "POWERED BY",
 
       menuOpen: "Open menu",
       menuClose: "Close menu",
       changeLanguage: "Switch to Spanish",
+      homeLabel: "Futlatino, home",
 
       feedback: {
         required: "Please complete all required fields.",
         invalidEmail: "Please enter a valid email address.",
         success: "Your application has been submitted successfully.",
-        error: "Your application could not be submitted. Please try again."
+        error: "Your application could not be submitted. Please try again.",
+        whatsappOpened: "WhatsApp has opened so you can send your application.",
+        demoReady: "The form is validated. To receive applications, set up the official WhatsApp number or connect a form service.",
+        demoToast: "Demo form: the receiving channel still needs to be configured."
       }
     }
   };
 
-  const $ = (selector) => document.querySelector(selector);
-  const $$ = (selector) => [...document.querySelectorAll(selector)];
+  const $ = selector => document.querySelector(selector);
+  const $$ = selector => [...document.querySelectorAll(selector)];
 
-  // Actualiza contenido sin modificar la estructura de los elementos.
+  // Cambia el contenido de un elemento si existe (no falla si falta en el HTML).
   function setText(selector, value, html = false) {
     const element = $(selector);
     if (!element) return;
+    if (html) element.innerHTML = value;
+    else element.textContent = value;
+  }
 
-    if (html) {
-      element.innerHTML = value;
-    } else {
-      element.textContent = value;
-    }
+  function setTextIn(parent, selector, value, html = false) {
+    const element = parent.querySelector(selector);
+    if (!element) return;
+    if (html) element.innerHTML = value;
+    else element.textContent = value;
   }
 
   function setTexts(selector, values) {
     $$(selector).forEach((element, index) => {
-      if (values[index] !== undefined) {
-        element.textContent = values[index];
-      }
+      if (values[index] !== undefined) element.textContent = values[index];
     });
   }
 
@@ -398,10 +386,6 @@ const languageButton = document.querySelector(".language-switch");
 
     document.documentElement.lang = language;
 
-    document.title = language === "es"
-      ? "Futlatino — Football Experiences. Global Opportunities."
-      : "Futlatino — Football Experiences. Global Opportunities.";
-
     const description = $("meta[name='description']");
     if (description) {
       description.content = language === "es"
@@ -409,7 +393,7 @@ const languageButton = document.querySelector(".language-switch");
         : "Futlatino connects Latin American football talent with international opportunities through scouting, development and unique experiences.";
     }
 
-    // Barra superior
+    // ---------- Barra superior ----------
     const announcement = $(".announcement");
     if (announcement) {
       const dot = announcement.querySelector(".announcement-dot");
@@ -418,87 +402,85 @@ const languageButton = document.querySelector(".language-switch");
       announcement.append(" " + t.announcement);
     }
 
-    // Navegación principal y pie de página
+    // ---------- Header y navegación ----------
     setTexts(".main-nav a", t.menu);
     setTexts(".footer-nav a", t.menu);
+    $$(".brand").forEach(brand => brand.setAttribute("aria-label", t.homeLabel));
 
-    setText(".header-actions .button-small", t.applyButton + " ", true);
     const headerButton = $(".header-actions .button-small");
-    if (headerButton) {
-      headerButton.innerHTML = `${t.applyButton} <span>↗</span>`;
-    }
+    if (headerButton) headerButton.innerHTML = `${t.applyButton} <span>↗</span>`;
 
-    // Hero
-    setText(".hero .eyebrow span", t.heroEyebrow);
+    // ---------- Hero ----------
+    // El texto del eyebrow va junto a un <span></span> vacío decorativo.
+    setText(".hero .eyebrow", `<span></span> ${t.heroEyebrow}`, true);
     setText(".hero h1", t.heroTitle, true);
     setText(".hero-description", t.heroDescription, true);
 
     const heroButtons = $$(".hero-buttons .button");
-    if (heroButtons[0]) {
-      heroButtons[0].innerHTML = `${t.heroAbout} <span>›</span>`;
-    }
-    if (heroButtons[1]) {
-      heroButtons[1].textContent = t.heroContact;
-    }
+    if (heroButtons[0]) heroButtons[0].innerHTML = `${t.heroAbout} <span>›</span>`;
+    if (heroButtons[1]) heroButtons[1].textContent = t.heroContact;
 
-    setText(".scroll-cue", t.scroll, true);
     const scrollCue = $(".scroll-cue");
-    if (scrollCue) {
-      scrollCue.innerHTML = `<span></span> ${t.scroll}`;
-    }
+    if (scrollCue) scrollCue.innerHTML = `<span></span> ${t.scroll}`;
 
-    // Sobre Futlatino
+    // ---------- Sobre Futlatino ----------
+    const aboutImage = $(".intro-image");
+    if (aboutImage) aboutImage.setAttribute("aria-label", t.aboutImageLabel);
+
     setText(".intro-copy .eyebrow span", t.aboutEyebrow);
     setText(".intro-copy h2", t.aboutTitle, true);
-    setTexts(".intro-copy p:not(.eyebrow)", [t.aboutP1, t.aboutP2]);
+    setText(".intro-copy p:not(.eyebrow)", t.aboutText);
 
     const aboutLink = $(".intro-copy .text-link");
-    if (aboutLink) {
-      aboutLink.innerHTML = `${t.aboutLink} <span>↗</span>`;
-    }
+    if (aboutLink) aboutLink.innerHTML = `${t.aboutLink} <span>↗</span>`;
 
-    // Programas
-    setText(".section-heading .eyebrow span", t.programsEyebrow);
-    setText(".section-heading h2", t.programsTitle);
-    setText(".section-intro", t.programsIntro);
+    // ---------- Nuestros pilares (nuevo diseño) ----------
+    setText(".pl-head .pl-eyebrow", `${t.pillarsEyebrow} <i></i>`, true);
+    setText(".pl-head h2", t.pillarsTitle);      // solo si existe el título en el HTML
+    setText(".pl-lead", t.pillarsLead);
 
-    $$(".pillar-card").forEach((card, index) => {
-      const data = t.cards[index];
+    $$(".pl-card").forEach((card, index) => {
+      const data = t.pillars[index];
       if (!data) return;
 
-      setTextFrom(card, ".pillar-body h3", data.title, true);
-      setTextFrom(card, ".pillar-body p", data.description);
-      const link = card.querySelector(".pillar-body > a");
-      if (link) link.setAttribute("aria-label", data.aria);
+      setTextIn(card, ".pl-body h3", data.title);
+      setTextIn(card, ".pl-body p", data.description);
+
+      card.querySelector(".pl-arrow")?.setAttribute("aria-label", data.aria);
+      card.querySelector(".pl-photo")?.setAttribute("aria-label", data.image);
     });
 
-    // Experiencias internacionales
+    // Red global
+    setText(".pl-eyebrow-left", `<i></i> ${t.networkEyebrow}`, true);
+    setText(".pl-network-copy h3", t.networkTitle);
+    setText(".pl-network-copy p:not(.pl-eyebrow)", t.networkText);
+
+    $$(".pl-mini").forEach((photo, index) => {
+      if (t.networkImages[index]) photo.setAttribute("aria-label", t.networkImages[index]);
+    });
+
+    // ---------- Experiencias internacionales ----------
     setText(".experience-heading .eyebrow span", t.experiencesEyebrow);
     setText(".experience-heading h2", t.experiencesTitle, true);
     setText(".experience-heading > p", t.experiencesDescription);
-    setTexts(".tile-label", t.tiles.map(label => label + " ↗"));
 
-    // Conserva los iconos y el diseño de cada tarjeta.
     $$(".tile-label").forEach((label, index) => {
       label.innerHTML = `<i></i> ${t.tiles[index] || ""} <b>↗</b>`;
     });
 
-    // Testimonios
+    // ---------- Testimonios (solo si la sección existe) ----------
     $$(".quote-slide").forEach((slide, index) => {
       const data = t.testimonials[index];
       if (!data) return;
-
-      setTextFrom(slide, "blockquote", data.quote);
-      setTextFrom(slide, "figcaption strong", data.role);
-      setTextFrom(slide, "figcaption small", data.program);
+      setTextIn(slide, "blockquote", data.quote);
+      setTextIn(slide, "figcaption strong", data.role);
+      setTextIn(slide, "figcaption small", data.program);
     });
 
-    const prev = $(".quote-prev");
-    const next = $(".quote-next");
-    if (prev) prev.setAttribute("aria-label", t.previousTestimonial);
-    if (next) next.setAttribute("aria-label", t.nextTestimonial);
+    $(".quote-prev")?.setAttribute("aria-label", t.previousTestimonial);
+    $(".quote-next")?.setAttribute("aria-label", t.nextTestimonial);
 
-    // Postulación
+    // ---------- Postulación / Contacto ----------
     setText(".application-copy .eyebrow span", t.applicationEyebrow);
     setText(".application-copy h2", t.applicationTitle, true);
     setText(".application-copy > p:not(.eyebrow)", t.applicationDescription);
@@ -510,14 +492,14 @@ const languageButton = document.querySelector(".language-switch");
 
     const form = $("#application-form");
     if (form) {
-      const fields = {
+      const placeholders = {
         nombre: t.namePlaceholder,
         edad: t.agePlaceholder,
-        email: "name@example.com",
+        email: t.emailPlaceholder,
         mensaje: t.messagePlaceholder
       };
 
-      Object.entries(fields).forEach(([name, placeholder]) => {
+      Object.entries(placeholders).forEach(([name, placeholder]) => {
         const input = form.querySelector(`[name="${name}"]`);
         if (input) input.placeholder = placeholder;
       });
@@ -526,9 +508,7 @@ const languageButton = document.querySelector(".language-switch");
       if (country) {
         country.options[0].textContent = t.countryPlaceholder;
         [...country.options].slice(1).forEach((option, index) => {
-          if (t.countries[index] !== undefined) {
-            option.textContent = t.countries[index];
-          }
+          if (t.countries[index] !== undefined) option.textContent = t.countries[index];
         });
       }
 
@@ -536,23 +516,18 @@ const languageButton = document.querySelector(".language-switch");
       if (position) {
         position.options[0].textContent = t.positionPlaceholder;
         [...position.options].slice(1).forEach((option, index) => {
-          if (t.positions[index] !== undefined) {
-            option.textContent = t.positions[index];
-          }
+          if (t.positions[index] !== undefined) option.textContent = t.positions[index];
         });
       }
 
       setText(".consent span", t.consent);
-      setText(".submit-button", t.submit + " ", true);
 
       const submit = $(".submit-button");
-      if (submit) {
-        submit.innerHTML = `${t.submit} <span>↗</span>`;
-      }
+      if (submit) submit.innerHTML = `${t.submit} <span>↗</span>`;
 
       setText(".form-note", t.formNote);
 
-      // Actualiza los mensajes ya visibles sin enviar de nuevo el formulario.
+      // Si ya hay un mensaje visible, se traduce sin reenviar el formulario.
       const feedback = $("#form-feedback");
       if (feedback && feedback.dataset.feedbackKey) {
         const message = t.feedback[feedback.dataset.feedbackKey];
@@ -560,23 +535,22 @@ const languageButton = document.querySelector(".language-switch");
       }
     }
 
-    // Pie de página
+    // ---------- Pie de página ----------
+    // Se conserva <span id="year"> para no romper el año automático.
     const copyright = $(".footer-bottom > span:first-child");
     if (copyright) {
-      const year = $("#year");
-      copyright.textContent = `© ${year ? year.textContent : new Date().getFullYear()} ${t.footerCopyright}`;
+      const currentYear = $("#year")?.textContent || new Date().getFullYear();
+      copyright.innerHTML = `© <span id="year">${currentYear}</span> ${t.footerCopyright}`;
     }
-
     setText(".footer-bottom > span:last-child", t.footerSlogan);
+    setText(".powered-by > span", t.poweredBy);
 
-    // Textos accesibles
+    // ---------- Accesibilidad y botón de idioma ----------
     const menuButton = $(".menu-toggle");
     if (menuButton) {
       menuButton.setAttribute(
         "aria-label",
-        menuButton.getAttribute("aria-expanded") === "true"
-          ? t.menuClose
-          : t.menuOpen
+        menuButton.getAttribute("aria-expanded") === "true" ? t.menuClose : t.menuOpen
       );
     }
 
@@ -589,48 +563,33 @@ const languageButton = document.querySelector(".language-switch");
       option.setAttribute("aria-current", active ? "true" : "false");
     });
 
-    // Conserva el idioma para la siguiente visita.
     try {
       localStorage.setItem("futlatino-language", language);
     } catch (_) {
-      // La traducción funciona incluso si el almacenamiento está bloqueado.
+      // La traducción funciona aunque el almacenamiento esté bloqueado.
     }
 
-    // Permite que otras funciones de la página conozcan el idioma activo.
     window.FUTLATINO_LANG = language;
     window.FUTLATINO_TRANSLATIONS = translations;
   }
 
-  function setTextFrom(parent, selector, value, html = false) {
-    const element = parent.querySelector(selector);
-    if (!element) return;
-
-    if (html) {
-      element.innerHTML = value;
-    } else {
-      element.textContent = value;
-    }
-  }
-
-  // Un único evento controla el cambio completo de idioma.
+  // Un único evento controla el cambio de idioma.
   switchButton.addEventListener("click", () => {
     const current = document.documentElement.lang === "en" ? "en" : "es";
     translatePage(current === "es" ? "en" : "es");
   });
 
-  // API para traducir mensajes desde otras funciones JavaScript.
+  // API para otras partes del script (mensajes del formulario, etc.).
   window.FUTLATINO_I18N = {
     translate: translatePage,
-
     message(key) {
       const language = window.FUTLATINO_LANG || "es";
       return translations[language].feedback[key] || "";
     }
   };
 
-  // Idioma guardado; español como opción predeterminada.
+  // Idioma guardado; español por defecto.
   let savedLanguage = "es";
-
   try {
     const saved = localStorage.getItem("futlatino-language");
     if (saved === "es" || saved === "en") savedLanguage = saved;
@@ -638,7 +597,6 @@ const languageButton = document.querySelector(".language-switch");
 
   translatePage(savedLanguage);
 })();
-
 
 
 /* =========================================
@@ -663,14 +621,9 @@ const languageButton = document.querySelector(".language-switch");
   function setActive(id) {
     links.forEach(link => {
       const active = link.getAttribute("href") === `#${id}`;
-
       link.classList.toggle("active", active);
-
-      if (active) {
-        link.setAttribute("aria-current", "page");
-      } else {
-        link.removeAttribute("aria-current");
-      }
+      if (active) link.setAttribute("aria-current", "page");
+      else link.removeAttribute("aria-current");
     });
   }
 
@@ -685,20 +638,14 @@ const languageButton = document.querySelector(".language-switch");
     .forEach(link => {
       link.addEventListener("click", event => {
         event.preventDefault();
-
         closeMobileMenu();
         setActive("inicio");
-
-        window.scrollTo({
-          top: 0,
-          behavior: "smooth"
-        });
-
+        window.scrollTo({ top: 0, behavior: "smooth" });
         history.replaceState(null, "", "#inicio");
       });
     });
 
-  // Actualizar la línea activa según la posición del scroll.
+  // Actualiza la línea activa según la posición del scroll.
   let ticking = false;
 
   function updateActiveSection() {
@@ -726,9 +673,6 @@ const languageButton = document.querySelector(".language-switch");
 
   // Navegación inicial y enlaces directos.
   const initialId = location.hash.slice(1);
-  if (ids.includes(initialId)) {
-    setActive(initialId);
-  } else {
-    updateActiveSection();
-  }
+  if (ids.includes(initialId)) setActive(initialId);
+  else updateActiveSection();
 })();
