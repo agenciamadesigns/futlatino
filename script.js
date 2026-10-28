@@ -56,12 +56,19 @@
   const year = document.getElementById("year");
   if (year) year.textContent = new Date().getFullYear();
 
-  // Formulario: valida los campos y prepara el mensaje para WhatsApp.
-  // Sustituye WHATSAPP_NUMBER por el número oficial en formato internacional, sin + ni espacios.
-  const WHATSAPP_NUMBER = "";
+  // ---------- Envío del formulario por correo (EmailJS) ----------
+  // 1) Crea tu cuenta en https://www.emailjs.com
+  // 2) Pega aquí los 3 datos (se explican en las instrucciones).
+  const EMAILJS = {
+    publicKey: "",   // Account → General → Public Key
+    serviceId: "",   // Email Services → Service ID
+    templateId: ""   // Email Templates → Template ID
+  };
+
   const form = document.getElementById("application-form");
   const feedback = document.getElementById("form-feedback");
   const toast = document.getElementById("toast");
+  const submitButton = form?.querySelector(".submit-button");
 
   // Mensajes traducibles (definidos en el sistema de idiomas más abajo)
   const msg = key => window.FUTLATINO_I18N?.message(key) || "";
@@ -73,34 +80,82 @@
   }
 
   function showToast(message) {
-    if (!toast) return;
+    if (!toast || !message) return;
     toast.textContent = message;
     toast.classList.add("show");
     window.setTimeout(() => toast.classList.remove("show"), 4500);
   }
 
-  form?.addEventListener("submit", event => {
+  // Campo trampa anti-spam: las personas no lo ven, los bots sí lo llenan.
+  if (form) {
+    const trap = document.createElement("input");
+    trap.type = "text";
+    trap.name = "website";
+    trap.tabIndex = -1;
+    trap.autocomplete = "off";
+    trap.setAttribute("aria-hidden", "true");
+    trap.style.cssText = "position:absolute;left:-9999px;width:0;height:0;opacity:0;";
+    form.appendChild(trap);
+  }
+
+  form?.addEventListener("submit", async event => {
     event.preventDefault();
     if (!form.reportValidity()) return;
 
     const data = new FormData(form);
-    const message = [
-      "Hola, quiero postularme a Futlatino.",
-      `Nombre: ${data.get("nombre")}`,
-      `País: ${data.get("pais")}`,
-      `Edad: ${data.get("edad")}`,
-      `Posición: ${data.get("posicion")}`,
-      `Correo: ${data.get("email")}`,
-      data.get("mensaje") ? `Información adicional: ${data.get("mensaje")}` : ""
-    ].filter(Boolean).join("\n");
+    if (data.get("website")) return; // es un bot
 
-    if (WHATSAPP_NUMBER) {
-      window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`, "_blank", "noopener,noreferrer");
-      setFeedback("whatsappOpened");
-    } else {
+    // Si aún no se configuran las credenciales, solo se valida el formulario.
+    if (!EMAILJS.publicKey || !EMAILJS.serviceId || !EMAILJS.templateId) {
       setFeedback("demoReady");
       showToast(msg("demoToast"));
-      console.info("Postulación Futlatino (demo):\n" + message);
+      return;
+    }
+
+    const lang = window.FUTLATINO_LANG || "es";
+
+    // Variables que usa la plantilla del correo: {{nombre}}, {{pais}}, etc.
+    const templateParams = {
+      nombre: data.get("nombre"),
+      pais: data.get("pais"),
+      edad: data.get("edad"),
+      posicion: data.get("posicion"),
+      email: data.get("email"),
+      reply_to: data.get("email"),
+      mensaje: (data.get("mensaje") || "").toString().trim() || "—",
+      idioma: lang === "en" ? "English" : "Español",
+      fecha: new Date().toLocaleString("es-MX", { dateStyle: "long", timeStyle: "short" })
+    };
+
+    submitButton.disabled = true;
+    submitButton.style.opacity = ".7";
+    setFeedback("sending");
+
+    try {
+      const response = await fetch("https://api.emailjs.com/api/v1.0/email/send", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          service_id: EMAILJS.serviceId,
+          template_id: EMAILJS.templateId,
+          user_id: EMAILJS.publicKey,
+          template_params: templateParams
+        })
+      });
+
+      if (!response.ok) throw new Error(await response.text());
+
+      form.reset();
+      setFeedback("success");
+      showToast(msg("success"));
+    } catch (error) {
+      console.error("Error al enviar la postulación:", error);
+      setFeedback("error");
+    } finally {
+      const t = window.FUTLATINO_TRANSLATIONS?.[window.FUTLATINO_LANG || "es"];
+      submitButton.disabled = false;
+      submitButton.style.opacity = "";
+      if (t) submitButton.innerHTML = `${t.submit} <span>↗</span>`;
     }
   });
 })();
@@ -192,7 +247,7 @@
       nextTestimonial: "Siguiente testimonio",
 
       applicationEyebrow: "SÉ PARTE",
-      applicationTitle: "EL SIGUIENTE PASO<br><em>COMIENZA AQUÍ.</em>",
+      applicationTitle: "<em>TODO COMIENZA AQUÍ.</em>",
       applicationDescription: "Postúlate, colabora o conoce más sobre nuestro proyecto.",
       steps: ["Cuéntanos de ti", "Conecta con el equipo", "Da el siguiente paso"],
 
@@ -229,12 +284,13 @@
 
       feedback: {
         required: "Por favor, completa todos los campos obligatorios.",
+        sending: "Enviando tu postulación…",
         invalidEmail: "Introduce un correo electrónico válido.",
-        success: "Tu postulación se ha enviado correctamente.",
+        success: "¡Gracias! Recibimos tu postulación y nos pondremos en contacto contigo pronto.",
         error: "No se pudo enviar tu postulación. Inténtalo de nuevo.",
         whatsappOpened: "Se abrió WhatsApp para que puedas enviar tu postulación.",
-        demoReady: "El formulario está validado. Para recibir postulaciones, configura el número oficial de WhatsApp o conecta un servicio de formularios.",
-        demoToast: "Formulario de demostración: falta configurar el canal de recepción."
+        demoReady: "El formulario está validado, pero aún falta configurar el envío por correo.",
+        demoToast: "Falta configurar las credenciales de EmailJS en script.js."
       }
     },
 
@@ -309,7 +365,7 @@
       nextTestimonial: "Next testimonial",
 
       applicationEyebrow: "BE PART OF IT",
-      applicationTitle: "YOUR NEXT STEP<br><em>STARTS HERE.</em>",
+      applicationTitle: "<em>IT ALL BEGINS HERE.</em>",
       applicationDescription: "Apply, collaborate or learn more about our project.",
       steps: ["Tell us about yourself", "Connect with our team", "Take the next step"],
 
@@ -346,12 +402,13 @@
 
       feedback: {
         required: "Please complete all required fields.",
+        sending: "Sending your application…",
         invalidEmail: "Please enter a valid email address.",
-        success: "Your application has been submitted successfully.",
+        success: "Thank you! We received your application and will get in touch soon.",
         error: "Your application could not be submitted. Please try again.",
         whatsappOpened: "WhatsApp has opened so you can send your application.",
-        demoReady: "The form is validated. To receive applications, set up the official WhatsApp number or connect a form service.",
-        demoToast: "Demo form: the receiving channel still needs to be configured."
+        demoReady: "The form is validated, but email delivery still needs to be configured.",
+        demoToast: "EmailJS credentials are still missing in script.js."
       }
     }
   };
