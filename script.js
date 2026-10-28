@@ -205,7 +205,7 @@
           image: "Scouting y visorías"
         },
         {
-          title: "SELECTIVOS Y GIRAS INTERNACIONALES",
+          title: "SELECTIVOS PARA TORNEOS Y GIRAS INTERNACIONALES",
           description: "Formamos selectivos de competición para participar en torneos y giras internacionales, ofreciendo experiencias de alto nivel que impulsan el desarrollo de nuestros jugadores.",
           aria: "Conocer selectivos y giras",
           image: "Selectivos y giras internacionales"
@@ -323,7 +323,7 @@
           image: "Scouting and showcases"
         },
         {
-          title: "SELECT TEAMS AND INTERNATIONAL TOURS",
+          title: "SELECTION EVENTS FOR INTERNATIONAL TOURNAMENTS AND TOURS",
           description: "We build competitive select teams to take part in international tournaments and tours, offering high-level experiences that drive our players' development.",
           aria: "Learn about select teams and tours",
           image: "Select teams and international tours"

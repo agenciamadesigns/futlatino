@@ -72,7 +72,7 @@ h1 em, h2 em { color: var(--gold); font-style: normal; }
 .section-light { background: var(--white); color: #171819; }
 .intro { display: grid; grid-template-columns: 1fr 1fr; min-height: 370px; }
 .image-cover { background-position: center; background-size: cover; background-repeat: no-repeat; }
-.intro-image { min-height: 370px; background-image: url("https://images.unsplash.com/photo-1517466787929-bc90951d0974?auto=format&fit=crop&w=1300&q=85"); background-position: center; }
+.intro-image { min-height: 370px; background-image: url("contenido/futlatino.jpeg"); background-position: center; }
 .intro-copy { align-self: center; max-width: 610px; padding: 60px clamp(32px, 5vw, 86px); }
 .intro-copy h2, .experience-heading h2 { margin: 0 0 18px; font-family: var(--heading); font-size: clamp(32px, 3.4vw, 47px); line-height: .95; font-weight: 800; }
 .intro-copy p:not(.eyebrow) { max-width: 520px; color: #555653; font-size: 13px; line-height: 1.65; }
@@ -3937,22 +3937,22 @@ html {
 .pl-photo-1 {
   background-image:
     url("contenido/pilar-1.jpg"),
-    url("https://images.unsplash.com/photo-1521412644187-c49fa049e84d?auto=format&fit=crop&w=800&q=80");
+    url("contenido/scouting.jpeg");
 }
 .pl-photo-2 {
   background-image:
     url("contenido/pilar-2.jpg"),
-    url("https://images.unsplash.com/photo-1517466787929-bc90951d0974?auto=format&fit=crop&w=800&q=80");
+    url("contenido/selectivos.jpeg");
 }
 .pl-photo-3 {
   background-image:
     url("contenido/pilar-3.jpg"),
-    url("https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=800&q=80");
+    url("contenido/tryouts.jpeg");
 }
 .pl-photo-4 {
   background-image:
     url("contenido/pilar-4.jpg"),
-    url("https://images.unsplash.com/photo-1522778119026-d647f0596c20?auto=format&fit=crop&w=800&q=80");
+    url("contenido/planificacion.jpeg");
 }
 
 .pl-body {
@@ -4104,7 +4104,7 @@ html {
 .pl-mini-2 {
   background-image:
     url("contenido/red-2.jpg"),
-    url("https://images.unsplash.com/photo-1508098682722-e99c643e7f0b?auto=format&fit=crop&w=500&q=80");
+    url("contenido/alianzas.jpeg");
 }
 .pl-mini-3 {
   background-image:
