@@ -3862,10 +3862,10 @@ html {
   inset: 0 0 auto 0;
   height: 620px;
   background:
-    linear-gradient(90deg, rgba(8,9,10,.92) 0%, rgba(8,9,10,.55) 45%, rgba(8,9,10,.2) 100%),
-    linear-gradient(180deg, rgba(8,9,10,.35) 0%, #0a0b0c 98%),
-    url("contenido/pilares-fondo.jpg") center 22% / cover no-repeat,
-    url("https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&w=1900&q=70") center 22% / cover no-repeat;
+    linear-gradient(90deg, rgba(8,9,10,.97) 0%, rgba(8,9,10,.85) 45%, rgba(8,9,10,.7) 100%),
+    linear-gradient(180deg, rgba(8,9,10,.6) 0%, #0a0b0c 95%),
+    url("contenido/pilares_fondo.jpg") center 22% / cover no-repeat,
+    url("contenido/pilares_fondo.png") center 22% / cover no-repeat;
 }
 
 .pl-wrap {
